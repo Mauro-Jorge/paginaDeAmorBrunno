@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Momo ❤️ Pinho - Nosso Amor</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #ffe6eb, #fcddec);
+      color: #e6005c;
+      text-align: center;
+      margin: 0;
+      padding: 2rem;
+      overflow-x: hidden;
+    }
+    h1 {
+      font-size: 2.5rem;
+      color: #d63384;
+      margin-bottom: 1.5rem;
+    }
+    .pulsing-heart {
+      animation: pulse 1.5s ease-in-out infinite;
+      display: inline-block;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.25); }
+      100% { transform: scale(1); }
+    }
+    h2, h3 {
+      font-size: 2rem;
+      color: #d63384;
+      margin-top: 2.5rem;
+      margin-bottom: 1rem;
+    }
+    canvas {
+      max-width: 700px;
+      margin: 2rem auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    #rouletteCanvas {
+        border-radius: 50%;
+        box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    }
+    .music-player-container {
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+      padding: 10px;
+      border-radius: 10px;
+      display: inline-block;
+      background-color: rgba(255, 255, 255, 0.7);
+      box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+    }
+    .music-player-container audio {
+      width: 300px;
+    }
+    .interactive-section, .countdown-container {
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 20px;
+      border-radius: 15px;
+      margin: 2rem auto;
+      max-width: 600px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      min-height: 100px;
+    }
+    #countdownTimer {
+      font-size: 1.8em;
+      font-weight: bold;
+      color: #d63384;
+    }
+    .container-title {
+        font-size: 1.8em;
+        color: #e6005c;
+        margin-bottom: 1em;
+    }
+
+    /* Estilos para o Mosaico de Imagens */
+    .image-mosaic-container { margin: 2.5rem auto; padding: 15px; background-color: rgba(255, 255, 255, 0.75); border-radius: 15px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); max-width: 900px; }
+    .image-mosaic { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+    .image-mosaic .mosaic-item { width: 100%; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 10px; box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+    .image-mosaic .mosaic-item img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform 0.3s ease, filter 0.3s ease; }
+    .image-mosaic .mosaic-item img:hover { transform: scale(1.08); filter: brightness(1.1); }
+    
+    /* Estilos para Animação do Envelope */
+    .envelope-container { position: relative; width: 320px; height: 220px; margin: 20px auto; cursor: pointer; }
+    .envelope { position: absolute; width: 100%; height: 100%; background-color: #ffc0cb; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); display: flex; align-items: center; justify-content: center; }
+    .envelope-flap { position: absolute; top: 0; left: 0; width: 100%; height: 55%; background-color: #ffb6c1; clip-path: polygon(0 0, 100% 0, 100% 30%, 50% 100%, 0 30%); transform-origin: top; transition: transform 0.7s ease-in-out; z-index: 3; }
+    .envelope-container.open .envelope-flap { transform: rotateX(180deg); }
+    .letter { position: absolute; width: 90%; height: 85%; background-color: #fffaf0; border: 1px solid #f0e68c; border-radius: 8px; padding: 15px; box-sizing: border-box; text-align: left; font-family: 'Courier New', Courier, monospace; font-size: 0.9rem; line-height: 1.5; color: #5c3a0a; overflow-y: auto; z-index: 1; transform: translateY(100%); opacity: 0; transition: transform 0.7s 0.5s ease-out, opacity 0.7s 0.5s ease-out; }
+    .envelope-container.open .letter { transform: translateY(-5%); opacity: 1; z-index: 2; }
+    .letter-content h4 { text-align: center; color: #d63384; margin-bottom: 10px; font-size: 1.1em; }
+    .letter-content p { margin-bottom: 12px; }
+    .letter-content .signature { text-align: right; margin-top: 15px; font-style: italic; }
+
+    /* Estilos para Roleta do Amor */
+    .roulette-container { display: flex; flex-direction: column; align-items: center; }
+    .spin-button { margin-top: 20px; padding: 12px 25px; font-size: 1.2em; background-color: #d63384; color: white; border: none; border-radius: 8px; cursor: pointer; transition: background-color 0.3s; }
+    .spin-button:hover { background-color: #c2185b; }
+    #rouletteResult { margin-top: 15px; font-size: 1.3em; font-weight: bold; color: #e6005c; }
+  </style>
+</head>
+<body>
+  <h1>Momo & Pinho <span class="pulsing-heart">❤️</span></h1>
+
+  <div class="image-mosaic-container">
+    <h3>Nossos Momentos ❤️</h3>
+    <div class="image-mosaic">
+      <div class="mosaic-item"><img src="img1.jpeg" alt="Momo & Pinho - Momento 1"></div>
+      <div class="mosaic-item"><img src="img2.jpeg" alt="Momo & Pinho - Momento 2"></div>
+      <div class="mosaic-item"><img src="img3.jpeg" alt="Momo & Pinho - Momento 3"></div>
+      <div class="mosaic-item"><img src="img4.jpeg" alt="Momo & Pinho - Momento 4"></div>
+      <div class="mosaic-item"><img src="img5.jpeg" alt="Momo & Pinho - Momento 5"></div>
+      <div class="mosaic-item"><img src="img6.jpeg" alt="Momo & Pinho - Momento 6"></div>
+      <div class="mosaic-item"><img src="img7.jpeg" alt="Momo & Pinho - Momento 7"></div>
+      <div class="mosaic-item"><img src="img8.jpeg" alt="Momo & Pinho - Momento 8"></div>
+    </div>
+  </div>
+
+  <h3>Uma música especial para nós:</h3>
+  <div class="music-player-container">
+    <audio id="local-audio-player" controls src="calma.mp3">Seu navegador não suporta o elemento de áudio.</audio>
+  </div>
+
+  <div class="countdown-container">
+    <p class="container-title" id="countdownTitle">Faltam apenas essas horas para o nosso dia</p>
+    <div id="countdownTimer">Carregando...</div>
+  </div>
+  
+  <div class="interactive-section">
+    <h2>Roleta do Amor 🎡💕</h2>
+    <div class="roulette-container">
+        <canvas id="rouletteCanvas" width="450" height="450"></canvas>
+        <button id="spinRouletteButton" class="spin-button">Girar a Roleta!</button>
+        <div id="rouletteResult">Clique para sortear!</div>
+    </div>
+  </div>
+
+  <h2>Nossa Jornada de Amor</h2>
+  <p id="loveJourneyDescription">Gráfico do crescimento do nosso amor...</p>
+  <canvas id="heartChart" width="400" height="400"></canvas>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // --- DATA DE INÍCIO DO RELACIONAMENTO PARA O GRÁFICO ---
+    const relationshipStartDate = new Date("August 2, 2024 00:00:00");
+
+    // --- Cronômetro Regressivo ---
+    try {
+        const targetDate = new Date("June 12, 2025 17:00:00").getTime();
+        const countdownTitleEl = document.getElementById('countdownTitle');
+        const countdownElement = document.getElementById("countdownTimer");
+
+        if (countdownTitleEl && countdownElement) {
+            const countdownInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+                if (distance < 0) {
+                    clearInterval(countdownInterval);
+                    countdownElement.innerHTML = ""; // Limpa o timer
+                    
+                    countdownTitleEl.innerHTML = "Uma mensagem para você, meu amor! 💌";
+                    const envelopeContainerDiv = document.createElement('div');
+                    envelopeContainerDiv.className = 'envelope-container';
+                    const envelopeDiv = document.createElement('div');
+                    envelopeDiv.className = 'envelope';
+                    const flapDiv = document.createElement('div');
+                    flapDiv.className = 'envelope-flap';
+                    const letterDiv = document.createElement('div');
+                    letterDiv.className = 'letter';
+                    letterDiv.innerHTML = `<div class="letter-content">
+                        <h4>Para o meu amor 💖</h4>
+                        <p>Feliz Dia dos Namorados, meu amor! 💖</p>
+                        <p>Hoje, não tem como eu não lembrar do nosso primeiro Dia dos Namorados juntos, há um ano…<br>
+                        Ali, dentro do carro, no estacionamento do McDonald’s. Simples, inesperado, mas tão cheio de significado. Porque naquele momento, mesmo sem um cenário perfeito ou um restaurante chique, tudo estava completo — porque eu estava com você.</p>
+                        <p>Aquele dia me mostrou que o que realmente importa é quem está ao nosso lado, e não onde estamos. E desde então, cada dia ao seu lado só confirmou isso. Você transforma qualquer lugar em lar, qualquer momento em memória, qualquer dia comum em algo especial.</p>
+                        <p>Sou grato por ter você, por nossas risadas, nossas conversas, e até pelos silêncios compartilhados. Obrigado por me amar do jeitinho que eu sou, e por fazer da nossa história algo único, real e tão bonito.</p>
+                        <p>Hoje, onde quer que a gente esteja, o mais importante continua igual: somos nós dois.<br>
+                        Te amo mais do que palavras conseguem dizer. E mal posso esperar para continuar escrevendo nossa história, capítulo por capítulo.</p>
+                        <p class="signature">Com todo o meu amor,<br>Momo</p>
+                    </div>`;
+                    envelopeDiv.appendChild(flapDiv);
+                    envelopeDiv.appendChild(letterDiv);
+                    envelopeContainerDiv.appendChild(envelopeDiv);
+                    countdownElement.appendChild(envelopeContainerDiv);
+                    
+                    envelopeContainerDiv.addEventListener('click', () => {
+                        envelopeContainerDiv.classList.toggle('open');
+                    });
+                    
+                    setTimeout(() => {
+                        envelopeContainerDiv.classList.add('open');
+                    }, 500);
+
+                } else {
+                    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                    countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s ⏳`;
+                }
+            }, 1000);
+        }
+    } catch (e) {
+        console.error("Erro no cronômetro:", e);
+    }
+
+    // --- Gráfico "Nossa Jornada de Amor" ---
+    try {
+        const currentDate = new Date();
+        const timeDiff = currentDate.getTime() - relationshipStartDate.getTime();
+        let daysPassedSinceStart = Math.max(1, Math.ceil(timeDiff / (1000 * 60 * 60 * 24)));
+        const loveJourneyDesc = document.getElementById('loveJourneyDescription');
+
+        if (loveJourneyDesc) {
+            loveJourneyDesc.textContent = `Gráfico do nosso amor desde 02/08/2024 - ${daysPassedSinceStart} dia(s) de crescimento!`;
+        }
+
+        function generateLogGrowthData(totalDays) {
+            const labels = [];
+            const dataMomo = [];
+            const dataPinho = [];
+            const A_Momo = 20, B_Momo = 0.15, C_Momo = 15;
+            const A_Pinho = 22, B_Pinho = 0.12, C_Pinho = 12;
+            for (let day = 1; day <= totalDays; day++) {
+                labels.push("Dia " + day);
+                dataMomo.push(A_Momo * Math.log(B_Momo * day + 1) + C_Momo + Math.random() * 2.5);
+                dataPinho.push(A_Pinho * Math.log(B_Pinho * day + 1) + C_Pinho + Math.random() * 2.5);
+            }
+            return { labels, dataMomo, dataPinho };
+        }
+
+        const { labels, dataMomo, dataPinho } = generateLogGrowthData(daysPassedSinceStart);
+        const heartChartCanvas = document.getElementById('heartChart');
+        if (heartChartCanvas) {
+            new Chart(heartChartCanvas.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels,
+                    datasets: [
+                        { label: 'Momo 💖', data: dataMomo, borderColor: '#ff69b4', backgroundColor: 'rgba(255,105,180,0.2)', fill: true, tension: 0.4 },
+                        { label: 'Pinho 💘', data: dataPinho, borderColor: '#db2777', backgroundColor: 'rgba(219,39,119,0.2)', fill: true, tension: 0.4 }
+                    ]
+                },
+                options: { responsive: true, plugins: { title: { display: true, text: 'O Crescimento Infinito do Nosso Amor ❤️', font: { size: 22 }, color: '#d63384' }, legend: { labels: { font: { size: 14 }}} }, scales: { y: { beginAtZero: false, title: { display: true, text: 'Intensidade do Amor' }}, x: { title: { display: true, text: 'Dias de Amor' }} }, animation: { duration: 1500, easing: 'easeInOutQuint' } }
+            });
+        }
+    } catch (e) {
+        console.error("Erro nos gráficos:", e);
+    }
+
+    // --- LÓGICA PARA ROLETA DO AMOR (CORRIGIDA) ---
+    try {
+        const rouletteCanvasEl = document.getElementById('rouletteCanvas');
+        const spinButtonEl = document.getElementById('spinRouletteButton');
+        const rouletteResultElementEl = document.getElementById('rouletteResult');
+
+        if (rouletteCanvasEl && spinButtonEl && rouletteResultElementEl) {
+            const rouletteCtxEl = rouletteCanvasEl.getContext('2d');
+            
+            const roulettePrizes = [
+                "vale caneco!!!", "Vale um cafuné demorado", "Vale um abraço de urso 🤗", "Escolher nosso filme/série 🎬",
+                "Jantar especial feito por mim 🍝", "Piquenique no nosso cantinho 🧺", "Um doce que você ama 🍩",
+                "Um desejo seu é uma ordem! 🧞", "Tarde de mimos e atenção total 🥰"
+            ];
+
+            const numSegmentsRoulette = roulettePrizes.length;
+            const anglePerSegmentRoulette = (2 * Math.PI) / numSegmentsRoulette;
+            const colorsRoulette = ["#FFC0CB", "#FFB6C1", "#FF69B4", "#DB7093", "#C71585", "#E6E6FA", "#D8BFD8", "#DDA0DD", "#BA55D3"];
+            let currentAngleRoulette = 0;
+            let isSpinningRoulette = false;
+            let animationFrameId = null;
+
+            function drawRouletteSegment(index, text, startAngle, endAngle) {
+                const centerX = rouletteCanvasEl.width / 2;
+                const centerY = rouletteCanvasEl.height / 2;
+                const radius = centerX - 10;
+                
+                rouletteCtxEl.beginPath();
+                rouletteCtxEl.fillStyle = colorsRoulette[index % colorsRoulette.length];
+                rouletteCtxEl.moveTo(centerX, centerY);
+                rouletteCtxEl.arc(centerX, centerY, radius, startAngle, endAngle);
+                rouletteCtxEl.closePath();
+                rouletteCtxEl.fill();
+                rouletteCtxEl.stroke();
+                rouletteCtxEl.save();
+                rouletteCtxEl.fillStyle = "#4B0082";
+                rouletteCtxEl.font = "bold 12px Segoe UI";
+                rouletteCtxEl.translate(centerX, centerY);
+                rouletteCtxEl.rotate(startAngle + anglePerSegmentRoulette / 2);
+                rouletteCtxEl.textAlign = "right";
+                const maxTextWidth = radius - 45;
+                rouletteCtxEl.fillText(text, maxTextWidth, 5);
+                rouletteCtxEl.restore();
+            }
+
+            function drawRoulette() {
+                rouletteCtxEl.clearRect(0, 0, rouletteCanvasEl.width, rouletteCanvasEl.height);
+                rouletteCtxEl.strokeStyle = '#d63384';
+                rouletteCtxEl.lineWidth = 2;
+                for (let i = 0; i < numSegmentsRoulette; i++) {
+                    drawRouletteSegment(i, roulettePrizes[i], currentAngleRoulette + i * anglePerSegmentRoulette, currentAngleRoulette + (i + 1) * anglePerSegmentRoulette);
+                }
+                rouletteCtxEl.fillStyle = '#e6005c';
+                rouletteCtxEl.beginPath();
+                rouletteCtxEl.moveTo(rouletteCanvasEl.width / 2 - 10, 7);
+                rouletteCtxEl.lineTo(rouletteCanvasEl.width / 2 + 10, 7);
+                rouletteCtxEl.lineTo(rouletteCanvasEl.width / 2, 38);
+                rouletteCtxEl.closePath();
+                rouletteCtxEl.fill();
+            }
+
+            function spinRoulette() {
+                if (isSpinningRoulette) return;
+                isSpinningRoulette = true;
+                spinButtonEl.disabled = true;
+                rouletteResultElementEl.textContent = "Girando...";
+
+                const winningSegmentIndex = Math.floor(Math.random() * roulettePrizes.length);
+                const spins = 8;
+                const fullSpinsRotation = spins * (2 * Math.PI);
+                const segmentMiddleAngle = anglePerSegmentRoulette * (winningSegmentIndex + 0.5);
+                const randomOffset = (Math.random() - 0.5) * (anglePerSegmentRoulette * 0.8);
+                const pointerAngle = 1.5 * Math.PI; // O ponteiro está no topo (270 graus)
+                const targetAngle = pointerAngle - (segmentMiddleAngle + randomOffset);
+                const totalRotation = fullSpinsRotation + targetAngle - (currentAngleRoulette % (2 * Math.PI));
+                
+                let startTimestamp = null;
+                const startAngleRad = currentAngleRoulette;
+
+                function rotate(timestamp) {
+                    const spinDuration = 6000;
+                    if (!startTimestamp) startTimestamp = timestamp;
+                    const progress = timestamp - startTimestamp;
+
+                    if (progress < spinDuration) {
+                        const easedProgress = 1 - Math.pow(1 - (progress / spinDuration), 4);
+                        currentAngleRoulette = startAngleRad + (totalRotation * easedProgress);
+                        drawRoulette();
+                        animationFrameId = requestAnimationFrame(rotate);
+                    } else {
+                        currentAngleRoulette = startAngleRad + totalRotation;
+                        drawRoulette();
+                        rouletteResultElementEl.innerHTML = `🎉 <strong>${roulettePrizes[winningSegmentIndex]}</strong> 🎉`;
+                        isSpinningRoulette = false;
+                        spinButtonEl.disabled = false;
+                    }
+                }
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = requestAnimationFrame(rotate);
+            }
+
+            spinButtonEl.addEventListener('click', spinRoulette);
+            drawRoulette();
+        }
+    } catch (e) {
+        console.error("Erro na Roleta:", e);
+    }
+});
+</script>
+</body>
+</html>
